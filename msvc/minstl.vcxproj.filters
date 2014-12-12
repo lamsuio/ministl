@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\minstl\bool.h">
+      <Filter>minstl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\minstl\vector.h">
+      <Filter>minstl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\minstl\common.h">
+      <Filter>minstl</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="minstl">
+      <UniqueIdentifier>{fbba3a46-510a-4a21-a30e-8e18c24ca48c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{6f5e8b07-5281-46bb-8b29-d25aedbd5c1e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="../test/bool_test.cc">
+      <Filter>test</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
