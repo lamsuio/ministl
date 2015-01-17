@@ -1,2 +1,6 @@
 #define MiniSTL_VERSION_MAJOR @MiniSTL_VERSION_MAJOR@
 #define MiniSTL_VERSION_MINOR @MiniSTL_VERSION_MINOR@
+
+// Add USE_NS
+//
+#cmakedefine NO_NS

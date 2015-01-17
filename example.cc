@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "MiniSTLConfig.h"
+#include "ministl/iterator.h"
 
 int main(int argc, char * argv[])
 {

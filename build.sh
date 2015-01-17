@@ -1,5 +1,5 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
-test -d build && rm -fr build/* || mkdir -p build
+test -d build || mkdir -p build
 cd build && cmake ..
-
+make
