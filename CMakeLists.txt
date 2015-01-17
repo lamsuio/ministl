@@ -22,6 +22,11 @@ file (APPEND test/main.cc "int main(int argc, char **argv) {")
 file (APPEND test/main.cc "testing::InitGoogleTest(&argc, argv);")
 file (APPEND test/main.cc "return RUN_ALL_TESTS();}\n")
 
+file(GLOB unittest_src
+    "test/*.h"
+    "test/*.cc"
+    )
+
 # including external project module
 include(ExternalProject)
 
@@ -50,7 +55,7 @@ ExternalProject_Add(
 ExternalProject_Get_Property(googletest source_dir)
 include_directories(${source_dir}/include)
 
-add_executable(main_test ${PROJECT_SOURCE_DIR}/test/main.cc)
+add_executable(main_test ${unittest_src})
 add_dependencies(main_test googletest)
 
 ExternalProject_Get_Property(googletest binary_dir)
