@@ -17,11 +17,11 @@ include_directories("${PROJECT_BINARY_DIR}")
 add_subdirectory(ministl)
 
 # create main.cc which uses gtest
-file (WRITE test/main.cc "#include \"gtest/gtest.h\"\n\n")
-file (APPEND test/main.cc "TEST(A, B) {SUCCEED(); }\n")
-file (APPEND test/main.cc "int main(int argc, char **argv) {")
-file (APPEND test/main.cc "testing::InitGoogleTest(&argc, argv);")
-file (APPEND test/main.cc "return RUN_ALL_TESTS();}\n")
+#file (WRITE test/main.cc "#include \"gtest/gtest.h\"\n\n")
+#file (APPEND test/main.cc "TEST(A, B) {SUCCEED(); }\n")
+#file (APPEND test/main.cc "int main(int argc, char **argv) {")
+#file (APPEND test/main.cc "testing::InitGoogleTest(&argc, argv);")
+#file (APPEND test/main.cc "return RUN_ALL_TESTS();}\n")
 
 file(GLOB unittest_src
     "test/*.h"
@@ -32,7 +32,7 @@ file(GLOB unittest_src
 include(ExternalProject)
 
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE Release)
+    set (CMAKE_BUILD_TYPE Debug)
 endif()
 
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/deps)

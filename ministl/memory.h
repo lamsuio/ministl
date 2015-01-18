@@ -33,10 +33,10 @@ private:
     }
 
 private:
-    static union obj * volatile free_list[__NFREELISTS] = { NULL };
+    static union obj * volatile free_list[__NFREELISTS];
 
     static inline size_t FREE_INDEX(size_t size) {
-        return ((size + __ALIGN - 1)/(__ALIGN - 1));
+        return ((size + __ALIGN - 1)/__ALIGN - 1);
     }
 
     // Fill the list when no free node in a list.
@@ -94,7 +94,7 @@ private:
             if (free_size > 0) {
                 obj * volatile * cur_free_list;
                 cur_free_list = free_list + FREE_INDEX(free_size);
-                ((obj *)start_free)->free_list_link = cur_free_list;
+                ((obj *)start_free)->free_list_link = *cur_free_list;
                 *cur_free_list = (obj *)start_free;
             }
 
@@ -106,7 +106,7 @@ private:
                 for (int i = size; i < __MAX_BYTES; i += __ALIGN) {
                     cur_free_list = free_list + FREE_INDEX(i);
                     if (*cur_free_list != 0) {
-                        start_free = *cur_free_list;
+                        start_free = (char *)*cur_free_list;
                         end_free = start_free + i;
                         *cur_free_list = (*cur_free_list)->free_list_link;
 
@@ -180,6 +180,10 @@ public:
 
 // 
 template<bool threads, int inst>
+typename __default_alloc_template<threads, inst>::obj * volatile
+__default_alloc_template<threads, inst>::free_list[__NFREELISTS] = {0};
+
+template<bool threads, int inst>
 char * __default_alloc_template<threads, inst>::start_free = 0;
 
 template<bool threads, int inst>
@@ -187,5 +191,143 @@ char * __default_alloc_template<threads, inst>::end_free = 0;
 
 template<bool threads, int inst>
 size_t __default_alloc_template<threads, inst>::heap_size = 0;
+
+///////// OBJECT CONSTRUCT //////////////
+
+template<class T1, class T2>
+inline void construct(T1 * pointer, const T2& value) {
+    new (pointer) T1(value);
+}
+
+template<class T>
+inline void construct(T * pointer, const T& value) {
+    new (pointer) T(value);
+}
+
+template<> inline void construct(char * p, const char& v) { *p = v; }
+template<> inline void construct(unsigned char * p, const unsigned char& v) {
+    *p = v; 
+}
+template<> inline void construct(short * p, const short& v) { *p = v; }
+template<> inline void construct(unsigned short * p, const unsigned short& v) {
+    *p = v; 
+}
+template<> inline void construct(int * p, const int& v) { *p = v; }
+template<> inline void construct(unsigned int * p, const unsigned int& v) { 
+    *p = v; 
+}
+template<> inline void construct(long * p, const long& v) { *p = v; }
+template<> inline void construct(unsigned long * p, const unsigned long& v) { 
+    *p = v; 
+}
+template<> inline void construct(float * p, const float& v) { *p = v; }
+template<> inline void construct(double * p, const double& v) { *p = v; }
+
+template<class T>
+inline void destroy(T* pointer) {
+    pointer->~T();
+}
+
+// destroy a native pointer
+template<> inline void destroy(char *) { }
+template<> inline void destroy(unsigned char *) { }
+template<> inline void destroy(short *) { }
+template<> inline void destroy(unsigned short *) { }
+template<> inline void destroy(int *) { }
+template<> inline void destroy(unsigned int *) { }
+template<> inline void destroy(long *) { }
+template<> inline void destroy(unsigned long *) { }
+template<> inline void destroy(float *) { }
+template<> inline void destroy(double *) { }
+
+template<> inline void destroy(char **) { }
+template<> inline void destroy(unsigned char **) { }
+template<> inline void destroy(short **) { }
+template<> inline void destroy(unsigned short **) { }
+template<> inline void destroy(int **) { }
+template<> inline void destroy(unsigned int **) { }
+template<> inline void destroy(long **) { }
+template<> inline void destroy(unsigned long **) { }
+template<> inline void destroy(float **) { }
+template<> inline void destroy(double **) { }
+
+// destroy a serial class poiner
+template<class ForwardIterator, class T>
+inline void destroy(ForwardIterator first, ForwardIterator last) {
+    while(first != last) {
+        (*first)->~T();
+        ++first;
+    }
+}
+
+template<class T>
+inline void destroy(T * first, T * last) {
+    while(first != last) {
+        (*first)->~T();
+        ++first;
+    }
+}
+template<> inline void destroy(char *, char *) { }
+template<> inline void destroy(unsigned char *, unsigned char *) { }
+template<> inline void destroy(short *, short *) { }
+template<> inline void destroy(unsigned short *, unsigned short *) { }
+template<> inline void destroy(int *, int *) { }
+template<> inline void destroy(unsigned int *, unsigned int *) { }
+template<> inline void destroy(long *, long *) { }
+template<> inline void destroy(unsigned long *, unsigned long *) { }
+template<> inline void destroy(float *, float *) { }
+template<> inline void destroy(double *, double *) { }
+ 
+template<> inline void destroy(char **, char **) { }
+template<> inline void destroy(unsigned char **, unsigned char **) { }
+template<> inline void destroy(short **, short **) { }
+template<> inline void destroy(unsigned short **, unsigned short **) { }
+template<> inline void destroy(int **, int **) { }
+template<> inline void destroy(unsigned int **, unsigned int **) { }
+template<> inline void destroy(long **, long **) { }
+template<> inline void destroy(unsigned long **, unsigned long **) { }
+template<> inline void destroy(float **, float **) { }
+template<> inline void destroy(double **, double **) { }
+
+///////////// COMMON [UN]INITIALIZATION METHODS ///////////
+
+template<class InputIterator, class ForwardIterator>
+ForwardIterator
+uninitialized_copy(InputIterator first, InputIterator last,
+                   ForwardIterator result) {
+//    return construct(&*(result + ()))
+//    TODO:
+    return result;
+}
+
+
+///////////// ALLOCATION OPERATOR IN MINISTL //////////////
+
+typedef __default_alloc_template<true, 0> alloc;
+
+template<class T, class Alloc = alloc>
+class mini_alloc {
+public:
+    static void * allocate(size_t size) { 
+        return size == 0 ? 0 : Alloc::allocate(size * sizeof(T));
+    }
+
+    static  void * allocate(void) {
+        return Alloc::allocate(sizeof(T));
+    }
+
+    static void deallocate(T * pointer, size_t size) {
+        if (pointer) {
+            Alloc::deallocate(pointer, size * sizeof(T));
+        }
+    }
+
+    static void deallocate(T * pointer) {
+        if (pointer) {
+            Alloc::deallocate(pointer, sizeof(T));
+        }
+    }
+
+};
 
 END_MINISTL
