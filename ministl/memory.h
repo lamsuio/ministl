@@ -29,7 +29,7 @@ private:
 
 private:
     static inline size_t ROUND_UP(size_t size) {
-        return ((size + __ALIGN - 1 ) & (__ALIGN - 1));
+        return ((size + __ALIGN - 1 ) & ~(__ALIGN - 1));
     }
 
 private:
