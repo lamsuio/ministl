@@ -80,7 +80,7 @@ public:
     explicit vector(size_t count) { fill_initialize(count, T()); } 
 
     ~vector() {
-        destroy(start, finish);
+        destroy<T>(start, finish);
         deallocate();
     }
 
@@ -100,7 +100,7 @@ public:
 
     void pop_back() {
         --finish;
-        destroy(finish);
+        destroy<T>(finish);
     }
 
 };
@@ -141,10 +141,11 @@ void vector<T, Alloc>::insert_aux(typename vector<T, Alloc>::iterator position,
             new_end++;
             pointer++;
         }
-        destroy(start, end);
+        destroy<T>(start, finish);
         data_allocate::deallocate(start, size());
+        construct(new_end, value);
         start = new_start;
-        finish = new_end;
+        finish = new_end+1;
         end_of_storage = start + new_size;
     }
 }

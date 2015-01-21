@@ -252,13 +252,13 @@ template<> inline void destroy(float **) { }
 template<> inline void destroy(double **) { }
 
 // destroy a serial class poiner
-template<class ForwardIterator, class T>
-inline void destroy(ForwardIterator first, ForwardIterator last) {
-    while(first != last) {
-        (*first)->~T();
-        ++first;
-    }
-}
+//template<class ForwardIterator, class T>
+//inline void destroy(ForwardIterator first, ForwardIterator last) {
+//    while(first != last) {
+//        (*first)->~T();
+//        ++first;
+//    }
+//}
 
 template<class T>
 inline void destroy(T * first, T * last) {
