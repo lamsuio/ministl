@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/resource.h>
 #include "gtest/gtest.h"
 #include "../ministl/vector.h"
 
@@ -50,7 +52,6 @@ TEST(VectorTest, PushEmpty) {
     EXPECT_EQ(vec[8], 9);
 }
 
-
 TEST(VectorTest, PushPop) {
     vector<int> vec;
     vec.push_back(1);
@@ -62,4 +63,14 @@ TEST(VectorTest, PushPop) {
     EXPECT_TRUE(vec.capacity() == 8);
     vec.push_back(100);
     EXPECT_TRUE(vec[1] == 100);
+}
+
+TEST(VectorTest, MemoryLeak) {
+    int i;
+    vector<int> v;
+    for (i = 0; i < 100000; i++) {
+        vector<int> vec(1000);
+        vec.push_back(1);
+    }
+    EXPECT_TRUE(v.size()==0);
 }
