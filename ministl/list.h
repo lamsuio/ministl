@@ -72,12 +72,12 @@ class list {
     protected:
         typedef mini_alloc<list_node<T>, Alloc> list_node_allocator;
 
-        link_type get_node(); // TODO: create memory space
-        void put_node(link_type p); //TODO: release node p
-        link_type create_node(const T& x); //TODO: create a node with x value
-        void destroy(link_type p); // TODO: destroy a node
+        link_type get_node() {return list_node_allocator::allocate(); } // create memory space
+        void put_node(link_type p) { list_node_allocator::deallocate(p)}; // release node p
+        link_type create_node(const T& x); // create a node with x value
+        void destroy_node(link_type p); // destroy a node
 
-        void empty_initialize();  //TODO: create a empty list;
+        void empty_initialize();  //create a empty list;
 
     public:
         void push_front(const T& x);
@@ -95,5 +95,72 @@ class list {
         void reverse();
         void sort();
 };
+
+template<class T, class Alloc>
+void list<T, Alloc>::destroy_node(typename list<T, Alloc>::link_type p) {
+    destroy(&p->value);
+    put_node(p);
+}
+
+template<class T, class Alloc>
+typename list<T, Alloc>::link_type
+list<T, Alloc>::create_node(const T& value) {
+    link_type p = get_node();
+    construct(&p->value, value);
+    return p;
+}
+
+template<class T, class Alloc>
+void list<T, Alloc>::empty_initialize() {
+    this->node = get_node();
+    this->node->next = this->node;
+    this->node->prev = this->node;
+}
+
+template<class T, class Alloc>
+void list<T, Alloc>::push_front(const T& x) {
+    link_type p = create_node(x);
+    p->next = this->node->next;
+    p->prev = this->node;
+    this->node->next = p;
+}
+
+template<class T, class Alloc>
+void list<T, Alloc>::push_back(const T& x) {
+    link_type p = create_node(x);
+    p->prev = this->node->prev;
+    p->next = this->node;
+    p->prev->next = p;
+    this->node->prev = p;
+}
+
+template<class T, class Alloc>
+typename list<T, Alloc>::iterator
+list<T, Alloc>::erase( typename list<T,Alloc>::iterator position) {
+    link_type next = position.node->next;
+    link_type tmp  = position.node;
+    tmp->prev->next = tmp->next;
+    tmp->next->prev = tmp->prev;
+    destroy_node(position.node);
+    return iterator(next);
+}
+
+template<class T, class Alloc>
+typename list<T, Alloc>::iterator
+list<T, Alloc>::erase(typename list<T, Alloc>::iterator start,
+        typename list<T, Alloc>::iterator last) {
+    //TODO:
+}
+
+template<class T, class Alloc>
+void list<T, Alloc>::pop_front() {
+    erase(begin());
+}
+
+template<class T, class Alloc>
+void list<T, Alloc>::pop_back() {
+    iterator tmp = end();
+    erase(--tmp);
+}
 
 END_MINISTL
