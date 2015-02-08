@@ -40,8 +40,8 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/deps)
 # add gtest now
 ExternalProject_Add(
     googletest
-    GIT_REPOSITORY https://github.com/svn2github/googletest.git
-    TIMEOUT 2
+    # GIT_REPOSITORY https://github.com/svn2github/googletest.git
+    TIMEOUT 1
     # FIXME: PATH_COMMAND
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -Dgtest_force_shared_crt=ON

@@ -28,7 +28,7 @@ TEST(VectorTest, PushElement) {
     EXPECT_TRUE(vec.size()== 11);
     EXPECT_TRUE(vec.capacity() == 20);
     EXPECT_TRUE(vec[10] == 2);
-    
+
     vector<int> vec2(2, 1);
     vec2.push_back(3);
     EXPECT_TRUE(vec2.size() == 3);
@@ -68,7 +68,7 @@ TEST(VectorTest, PushPop) {
 TEST(VectorTest, MemoryLeak) {
     int i;
     vector<int> v;
-    for (i = 0; i < 100000; i++) {
+    for (i = 0; i < 1000; i++) {
         vector<int> vec(1000);
         vec.push_back(1);
     }

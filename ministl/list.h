@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include "common.h"
+#include "memory.h"
 #include "iterator.h"
 
 START_MINISTL
@@ -30,21 +31,21 @@ struct list_iterator {
     link_type node; // current link node
 
     list_iterator(link_type n) : node(n) {}
-    list_iterator() : {}
+    list_iterator()  {}
     list_iterator(const iterator& x) : node(x.node) {}
 
     bool operator==(const self& other) const { return other.node == node; }
     bool operator!=(const self& other) const { return other.node != node; }
-    reference operator*() const { return (*node).value; }
+    reference operator*() const { return node->value; }
 
     // TODO: Standard member access operator
     pointer  operator->() const { return &(operator*()); }
 
-    reference operator++() { node = node->next; return *this; }
-    reference operator++(int) { self tmp = *this; ++(*this); return tmp; }
+    self& operator++() { node = node->next; return *this; }
+    self operator++(int) { self tmp = *this; ++(*this); return tmp; }
 
-    reference operator--() { node = node->prev; return *this; }
-    reference operator--(int) { self tmp = *this; --(*this); return tmp; }
+    self&  operator--() { node = node->prev; return *this; }
+    self   operator--(int) { self tmp = *this; --(*this); return tmp; }
 };
 
 template<class T, class Alloc=alloc>
@@ -52,8 +53,8 @@ class list {
     public:
         typedef list_node<T> * link_type;
         typedef list_iterator<T, T&, T*> iterator;
-        typedef iterator::size_type size_type;
-        typedef iterator::diifference_type difference_type;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type;
         typedef T& reference;
         typedef T* pointer;
 
@@ -64,7 +65,7 @@ class list {
         iterator begin() const { return node->next; }
         iterator end() const { return node; }
         bool  empty() const { return begin() == end();}
-        size_type size() const;// TODO:
+        size_type size() const ;
 
         reference front() { return *begin(); }
         reference back() { return *(--end());}
@@ -72,19 +73,20 @@ class list {
     protected:
         typedef mini_alloc<list_node<T>, Alloc> list_node_allocator;
 
-        link_type get_node() {return list_node_allocator::allocate(); } // create memory space
-        void put_node(link_type p) { list_node_allocator::deallocate(p)}; // release node p
+        link_type get_node() {return (link_type)list_node_allocator::allocate(); } // create memory space
+        void put_node(link_type p) { list_node_allocator::deallocate(p); } // release node p
         link_type create_node(const T& x); // create a node with x value
         void destroy_node(link_type p); // destroy a node
 
         void empty_initialize();  //create a empty list;
 
     public:
+        list(){ empty_initialize(); }
         void push_front(const T& x);
         void push_back(const T& x);
         iterator insert(iterator position, const T& x);
-        void erase(iterator postion);
-        void erase(iterator start, iterator last);
+        iterator erase(iterator postion);
+        iterator erase(iterator start, iterator last);
         T& pop_back();
         T& pop_front();
         void clear();
@@ -123,6 +125,7 @@ void list<T, Alloc>::push_front(const T& x) {
     p->next = this->node->next;
     p->prev = this->node;
     this->node->next = p;
+    p->next->prev = p;
 }
 
 template<class T, class Alloc>
@@ -149,18 +152,62 @@ template<class T, class Alloc>
 typename list<T, Alloc>::iterator
 list<T, Alloc>::erase(typename list<T, Alloc>::iterator start,
         typename list<T, Alloc>::iterator last) {
-    //TODO:
+    iterator tmp = start;
+    last.node->prev = start.node->prev;
+    start.node->prev->next = last.node;
+
+    while (start != last) {
+        tmp = start;
+        ++start;
+        destroy_node(tmp.node);
+    }
+
+    return last;
 }
 
 template<class T, class Alloc>
-void list<T, Alloc>::pop_front() {
-    erase(begin());
+typename list<T, Alloc>::iterator
+list<T,Alloc>::insert(typename list<T, Alloc>::iterator position,
+        const T& x) {
+    link_type p = create_node(x);
+    p->next = position.node->next;
+    position.node->next = p;
+    p->prev = position.node;
+    p->next->prev = p;
+    return iterator(p);
 }
 
 template<class T, class Alloc>
-void list<T, Alloc>::pop_back() {
+void list<T, Alloc>::clear(){
+    iterator start = begin();
+    iterator last  = end();
+    erase(start, last);
+    node->next = node;
+    node->prev = node;
+}
+
+template<class T, class Alloc>
+T& list<T, Alloc>::pop_front() {
+    iterator it = erase(begin());
+    return *it;
+}
+
+template<class T, class Alloc>
+T& list<T, Alloc>::pop_back() {
     iterator tmp = end();
-    erase(--tmp);
+    return *erase(--tmp);
+}
+
+template<class T, class Alloc>
+typename list<T, Alloc>::size_type
+list<T, Alloc>::size() const {
+    iterator tmp = begin();
+    size_type length = 0;
+    while (tmp != end()) {
+        ++length;
+        ++tmp;
+    }
+    return length;
 }
 
 END_MINISTL

@@ -2,4 +2,4 @@
 
 test -d build || mkdir -p build
 cd build && cmake ..
-make
+make && valgrind --leak-check=full --show-leak-kinds=all -v ./main_test
