@@ -243,11 +243,11 @@ void avl_tree<T, Alloc>::ll_rotation(node_type& top) {
     node_type lr = top->left->right;    // Save D
     node_type parent = top->parent;     // Save top parent
     top->left->right = top;             // set A.right to X
-    top->parent = top->left->right;
+    top->parent = top->left;
     top = top->left;                    // set top to A
     top->parent = parent;
     top->right->left = lr;              // set x.left = D
-    if (lr != nullptr) lr->parent = top->right->left;      // fix D.parent
+    if (lr != nullptr) lr->parent = top->right;      // fix D.parent
     update_node(top->right);
     update_node(top);
 }
@@ -283,11 +283,11 @@ void avl_tree<T, Alloc>::rr_rotation(node_type& top) {
     node_type rl = top->right->left; // C
     node_type parent = top->parent;
     top->right->left = top;          // set B left to X
-    top->parent = top->right->left;
+    top->parent = top->right;
     top = top->right;                // set Top to B,
     top->parent = parent;
     top->left->right = rl;           // now top is B, fix X.right
-    if (rl != nullptr) rl->parent = top->left->right;
+    if (rl != nullptr) rl->parent = top->left;
     update_node(top->left);          // fix X.height
     update_node(top);                // fix B.height
 }
