@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 project (MiniSTL)
 set (MiniSTL_VERSION_MAJOR 0)
 set (MiniSTL_VERSION_MINOR 1)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/MiniSTLConfig.h.in"
