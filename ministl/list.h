@@ -82,6 +82,7 @@ class list {
 
     public:
         list(){ empty_initialize(); }
+        ~list() {clear(); destroy_node(node); }
         void push_front(const T& x);
         void push_back(const T& x);
         iterator insert(iterator position, const T& x);
