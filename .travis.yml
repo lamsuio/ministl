@@ -2,7 +2,6 @@ language: cpp
 script: ./build.sh
 
 compiler:
-  - g++
   - clang++
 before_install:
   - echo $LANG
