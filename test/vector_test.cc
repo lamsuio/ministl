@@ -1,5 +1,3 @@
-#include <unistd.h>
-#include <sys/resource.h>
 #include "gtest/gtest.h"
 #include "../ministl/vector.h"
 

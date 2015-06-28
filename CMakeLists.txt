@@ -4,6 +4,10 @@ set (MiniSTL_VERSION_MAJOR 0)
 set (MiniSTL_VERSION_MINOR 1)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
+IF( COMMAND CMAKE_POLICY )
+   CMAKE_POLICY( SET CMP0008 NEW )
+ENDIF( COMMAND CMAKE_POLICY )
+
 configure_file(
     "${PROJECT_SOURCE_DIR}/MiniSTLConfig.h.in"
     "${PROJECT_BINARY_DIR}/MiniSTLConfig.h"
@@ -60,7 +64,12 @@ add_executable(main_test ${unittest_src})
 add_dependencies(main_test googletest)
 
 ExternalProject_Get_Property(googletest binary_dir)
+
+IF(WIN32)
+set(Suffix ".lib")
+ELSE()
 set(Suffix ".a")
+ENDIF()
 set(Pthread "-pthread")
 target_link_libraries(
     main_test

@@ -9,6 +9,7 @@
 
 #include <iostream>
 #ifdef _MSC_VER
+#define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
 #include <gtest/gtest.h>
@@ -35,6 +36,7 @@ namespace testing
         int diffResult = _CrtMemDifference(&stateDiff, &memState_, &stateNow);
         if (diffResult)
         {
+			_CrtDumpMemoryLeaks();
           FAIL() << "Memory leak of " << stateDiff.lSizes[1] << " byte(s) detected.";
         }
       }

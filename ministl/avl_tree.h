@@ -150,6 +150,13 @@ protected:
     }
 
     void destroy_node(node_type node) { destroy(&node->value); put_node(node); }
+    void destroy_subnode(node_type node) {
+        if (node->left != nullptr) 
+            destroy_subnode(node->left);
+        if (node->right != nullptr)
+            destroy_subnode(node->right);
+        destroy_node(node);
+    }
     void empty_initialize() {
         header = create_node(T());
         root = nullptr;
@@ -170,6 +177,11 @@ private:
 public:
     // Constructor of class
     avl_tree() { empty_initialize(); }
+    virtual ~avl_tree() {
+		if (root != nullptr)
+			destroy_subnode(root);
+        destroy_node(header);
+    }
     // TODO: Copy Constructor and operator
     //
 

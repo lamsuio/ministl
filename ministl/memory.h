@@ -338,6 +338,39 @@ uninitialized_copy(InputIterator first, InputIterator last,
     return result;
 }
 
+template<class InputIterator, class ForwardIterator>
+ForwardIterator
+copy(InputIterator first, InputIterator last,
+                   ForwardIterator result) {
+    while(first != last) {
+        *result = *first;
+        ++result;
+        ++first;
+    }
+    return result;
+}
+
+template<class InputIterator, class BackwardIterator>
+BackwardIterator
+copy_backward(InputIterator first, InputIterator last,
+                   BackwardIterator result) {
+    while (first != last) {
+        --result;
+        --last;
+        *result = *last;
+    } 
+    return result;
+}
+
+template<class InputIterator, class T>
+void uninitialized_fill(InputIterator first, InputIterator last,
+                   const T& val) {
+    while(first != last) {
+        *first = val;
+        ++first;
+    }
+}
+
 
 ///////////// ALLOCATION OPERATOR IN MINISTL //////////////
 
