@@ -178,9 +178,9 @@ class deque {
         
         void push_front_aux(const T& t);
         
-        void pop_back_aux();
+		void pop_back_aux(){}
         
-        void pop_front_aux();
+		void pop_front_aux(){}
         
     public:
         deque (): first(), last(), map(nullptr), map_size(0) {
@@ -333,5 +333,4 @@ void deque<T, Alloc, BufSize>::reallocate_map(size_type size_to_add, bool is_fro
 }
 
 END_MINISTL
-
 
