@@ -24,6 +24,8 @@ function CheckEnvironment()
     Write-Verbose "-- Compile and logging file to $log_file"
     
     MSBuild .\MiniSTL.sln /flp1:logfile="$log_file"
+        
+    cd ..
 }
 
 CheckEnvironment
