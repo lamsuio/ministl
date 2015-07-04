@@ -35,6 +35,7 @@ private:
 private:
     // this memory will leak, so we need another manager to manage
     // the default allocator
+	// We need to remember everything we allocated.
     // TODO: not thread-safe
     class __fake_inner_raii
     {
