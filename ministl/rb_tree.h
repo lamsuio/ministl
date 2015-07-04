@@ -30,7 +30,7 @@ struct rb_tree_iterator
     typedef T           value_type;
     typedef Reference   reference;
     typedef Pointer     pointer;
-//    typedef bidirectional_iterator_tag  iterator_category;
+    typedef bidirectional_iterator_tag  iterator_category;
     
     link_type node;
     
@@ -62,6 +62,14 @@ struct rb_tree_iterator
         desc();
         return tmp;
     }
+
+	bool operator==(const rb_tree_iterator& other) {
+		return this->node == other.node;
+	}
+
+	bool operator!=(const rb_tree_iterator& other) {
+		return this->node != other.node;
+	}
     
     //前进一位
     void incr() {
@@ -106,8 +114,8 @@ struct rb_tree_iterator
 
 template<class R, class Arg>
 struct self {
-    R operator()(const Arg& v) const {
-        return (R)v;
+    R& operator()(const Arg& v) const {
+        return (R&)v;
     }
 };
 
@@ -173,7 +181,7 @@ protected:
     static link_type& parent(link_type x) { return x->parent_;}
     static reference  value(link_type x) { return x->value_;}
 	static color_type& color(link_type x) { return x->color_; }
-	const Key& key(link_type x) { return key_of_value(x->value_); } //TODO:
+	const Key& key(link_type x) { return KeyOfValue()(x->value_); } //TODO:
     
     // 求极值
     static link_type minimum(link_type x) {
@@ -191,14 +199,17 @@ public:
     // 迭代器类型在此
     typedef rb_tree_iterator<value_type, reference, pointer> iterator;
 	
-	void clear(){} //TODO: Not implemented
+	void clear(); 
 
 private:
+	iterator  header_iterator;
+
     link_type copy(link_type x, link_type y);
     void erase(link_type x);
     
     void init() {
         header = get_node();
+		header_iterator = iterator(header);
         color(header) = kRed;
         root() = nullptr;
         leftmost() = header;
@@ -255,10 +266,18 @@ public:
 		destroy_node(header);
 	}
 
-    void push(const value_type& value) {
-        insert_equal(value);
-    }
+    void push(const value_type& value) { insert_equal(value);}
+
+	iterator begin() const { return iterator(header->left_); }
+	iterator end() const { return header_iterator; }
+	size_type size() const { return node_count; }
+
 };
+
+template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc>
+void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::clear(){
+	//TODO: Not implemented
+}
 
 template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc>
 void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::rb_rebalance(link_type x, link_type& root){
@@ -345,7 +364,7 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::rb_tree_rotate_right(li
 
 	if (x == root)
 		root = y;
-	else if (x->parent_->right_)
+	else if (x == x->parent_->right_) // Lose a equal assertion
 		x->parent_->right_ = y;
 	else
 		x->parent_->left_ = y;
