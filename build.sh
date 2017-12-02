@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 test -d build || mkdir -p build
 cd build && cmake ..

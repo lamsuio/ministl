@@ -152,7 +152,7 @@ class deque {
         pointer allocate_node() { return (pointer)data_allocator::allocate(buffer_size()); }
 		void deallocate_data(pointer data) { // 释放每个node 指向的区域
 			size_type size = buffer_size();
-			for (auto i = 0; i < size; i++){
+			for (size_type i = 0; i < size; i++){
 				destroy(&(*(data + i)));
 			}
 			data_allocator::deallocate(data, size);
@@ -169,7 +169,8 @@ class deque {
         }
         
         void reserve_map_at_front(size_type size_to_add = 1) {
-            if(size_to_add > (first.node - map)) {
+            if(first.node >= map && size_to_add > (size_type)(first.node - map))
+            {
                 reallocate_map(size_to_add, false);
             }
         }

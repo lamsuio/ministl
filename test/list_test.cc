@@ -17,7 +17,7 @@ TEST(ListTest, PutTest) {
     EXPECT_EQ(l.front(), 2);
     EXPECT_EQ(l.back(), 1);
     l.push_back(3);
-    EXPECT_EQ(l.size(), 3);
+    EXPECT_EQ(l.size(), 3u);
     EXPECT_EQ(l.front(), 2);
     EXPECT_EQ(l.back(), 3);
     list<int>::iterator it = l.begin();

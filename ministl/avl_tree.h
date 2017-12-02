@@ -245,11 +245,12 @@ void avl_tree<T, Alloc>::rotate_unclosewise(node_type top) {
 }
 
 // Rotate left
-//   (X)             A
-//   /  \           / \
-//  A    B    ==>  C  (X)
-// / \                / \
-//C  D               D   B
+/**  (X)             A
+ *   /  \           / \
+ *  A    B    ==>  C  (X)
+ * / \                / \
+ *C  D               D   B
+ */
 template<class T, class Alloc>
 void avl_tree<T, Alloc>::ll_rotation(node_type& top) {
     node_type lr = top->left->right;    // Save D
@@ -265,13 +266,15 @@ void avl_tree<T, Alloc>::ll_rotation(node_type& top) {
 }
 
 // Rotate left then right(or reverse?)
-//   (X)           (X)
-//   / \   (A_r_D) / \   (D_l_X)
-// [A]  B    ==> [D]  B  ==>  ...
-// / \           / \
-//C [D]        [A]  F
-//  / \        / \
-// E   F      C  E
+/**
+ *    (X)           (X)
+ *    / \   (A_r_D) / \   (D_l_X)
+ *  [A]  B    ==> [D]  B  ==>  ...
+ *  / \           / \
+ * C [D]        [A]  F
+ *   / \        / \
+ *  E   F      C  E
+ **/
 template<class T, class Alloc>
 void avl_tree<T, Alloc>::lr_rotation(node_type& top) {
     //node_type lrl = top->left->right->left; // save E
@@ -285,11 +288,13 @@ void avl_tree<T, Alloc>::lr_rotation(node_type& top) {
 }
 
 // Rotate right
-//    (X)            B
-//    / \           / \
-//   A   B    ==> (X)  D
-//      / \       / \
-//     C   D     A   C
+/**
+ *    (X)            B
+ *    / \           / \
+ *   A   B    ==> (X)  D
+ *      / \       / \
+ *     C   D     A   C
+**/
 template<class T, class Alloc>
 void avl_tree<T, Alloc>::rr_rotation(node_type& top) {
     node_type rl = top->right->left; // C
@@ -305,13 +310,15 @@ void avl_tree<T, Alloc>::rr_rotation(node_type& top) {
 }
 
 // Rotate right then left(or reverse?)
-//   (X)           (X)
-//   / \   (C_l_B) / \   (C_r_X)
-//  A   B    ==>  A   C  ==>  ...
-//     / \           / \
-//    C   D         E   B
-//   / \               / \
-//  E   F             F   D
+/**
+ *   (X)           (X)
+ *   / \   (C_l_B) / \   (C_r_X)
+ *  A   B    ==>  A   C  ==>  ...
+ *     / \           / \
+ *    C   D         E   B
+ *   / \               / \
+ *  E   F             F   D
+**/
 template<class T, class Alloc>
 void avl_tree<T, Alloc>::rl_rotation(node_type& top) {
     if (top->right == NULL)
