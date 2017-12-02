@@ -14,7 +14,7 @@ TEST(MinSTLTest, BoolTest)
     EXPECT_EQ(int(Bool(-1)), 1);
     EXPECT_EQ(int(Bool(10)), 1);
     EXPECT_EQ(int(Bool(0)), 0);
-    EXPECT_EQ(sizeof(Bool(0)), 1);
+    EXPECT_EQ(sizeof(Bool(0)), 1u);
 
     EXPECT_TRUE(Bool(-1));
     EXPECT_FALSE(Bool(0));

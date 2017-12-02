@@ -23,7 +23,7 @@ private:
     static const char bit_per_word = 8;
 
     static inline size_type ROUND_UP(size_type new_size) {
-        return new_size + (bit_per_word - 1) & ~(bit_per_word - 1);
+        return (new_size + (bit_per_word - 1))& ~(bit_per_word - 1);
     } 
 
 protected:
