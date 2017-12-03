@@ -63,11 +63,11 @@ struct rb_tree_iterator
         return tmp;
     }
 
-	bool operator==(const rb_tree_iterator& other) {
+	bool operator==(const rb_tree_iterator& other) const {
 		return this->node == other.node;
 	}
 
-	bool operator!=(const rb_tree_iterator& other) {
+	bool operator!=(const rb_tree_iterator& other) const {
 		return this->node != other.node;
 	}
 
@@ -119,6 +119,9 @@ struct self {
         return (R&)v;
     }
 };
+
+template <class>
+struct __rb_test_helper;
 
 template<class Key,
          class Value = Key,
@@ -183,11 +186,11 @@ protected:
     link_type& rightmost() { return header->right_; }
 
     // member of node
-    static link_type&  left(link_type x)     { return x->left_;}
-    static link_type&  right(link_type x)    { return x->right_;}
-    static link_type&  parent(link_type x)   { return x->parent_;}
-    static reference   value(link_type x)    { return x->value_;}
-	static color_type& color(link_type x)   { return x->color_; }
+    static link_type&  left(link_type x)     { return x->left_; }
+    static link_type&  right(link_type x)    { return x->right_; }
+    static link_type&  parent(link_type x)   { return x->parent_; }
+    static reference   value(link_type x)    { return x->value_; }
+	static color_type& color(link_type x)    { return x->color_; }
 	const Key& key(link_type x) { return KeyOfValue()(x->value_); } //TODO:
 
     static link_type minimum(link_type x) {
@@ -204,7 +207,7 @@ protected:
 public:
     // iterator type
     typedef rb_tree_iterator<value_type, reference, pointer> iterator;
-	
+
 	void clear();
 
 private:
@@ -279,7 +282,8 @@ private:
 
 	void rb_tree_rotate_right(link_type x, link_type& root); // clockwise, right rotation
 
-    void rb_tree_verify();
+    // a test inject to access tree's inner structure
+    friend __rb_test_helper<rb_tree>;
 
 public:
 	rb_tree(){ init(); }
@@ -530,8 +534,100 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::rb_tree_rotate_right(li
 // 5. every path from root to any leaf, must contains the same number of the black node
 //
 // so we should verify 4&5 prperties
-template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc>
-void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::rb_tree_verify() {
-}
+template <class rb_tree>
+struct __rb_test_helper {
+    typedef typename rb_tree::iterator   iterator;
+    typedef typename rb_tree::link_type  link_type;
+
+    const rb_tree* tree;
+
+    __rb_test_helper(const rb_tree* t) { tree = t; }
+
+    link_type root() {
+        // the tree->root() return ref
+        return tree->header->parent_;
+    }
+
+    iterator next_edge_node(iterator it) {
+        for (++it; it != tree->end(); ++it) {
+            link_type x = it.node;
+            // if left is empty, that means we approached one edge now.
+            // because the cursor is forward, so we need check left firstly.
+            if (rb_tree::left(x) == nullptr) {
+                return it;
+            } else if (rb_tree::right(x) == nullptr) {
+                // if right is empty, that means another edge approached.
+                return it;
+            }
+        }
+        return it;
+    }
+
+    int black_count(iterator it) {
+        link_type x = it.node;
+        int blackCount = 0;
+        while (x != tree->header->parent_) {
+            if (rb_tree::color(x) == kBlack) {
+                ++blackCount;
+            }
+            x = rb_tree::parent(x);
+        }
+
+        return blackCount;
+    }
+
+    // 1. node is red or black
+    // return end if fit, or return illegal iterator
+    iterator rule_1() {
+        for (auto it = tree->begin(); it != tree->end(); ++it) {
+            link_type x = it.node;
+            if (rb_tree::color(x) != kRed && rb_tree::color(x) != kBlack) {
+                return it;
+            }
+        }
+        return tree->end();
+    }
+
+    // 2. root is black
+    iterator rule_2() {
+        return rb_tree::color(root()) == kBlack ? tree->end() : iterator(root());
+    }
+
+    // 3. all leaf is black(y)
+    iterator rule_3() {
+        return tree->end();
+    }
+
+    // 4. every red node has two black children
+    // return end if fit, or return illegal iterator
+    iterator rule_4() {
+        for (auto it = tree->begin(); it != tree->end(); ++it) {
+            link_type x = it.node;
+            if (rb_tree::color(x) == kRed) {
+                link_type l = rb_tree::left(x);
+                link_type r = rb_tree::right(x);
+                if ((l != nullptr && rb_tree::color(l) == kRed) ||
+                    (r != nullptr && rb_tree::color(r) == kRed)) {
+                    return it;
+                }
+            }
+        }
+        return tree->end();
+    }
+
+    // 5. every path from root to any leaf, must contains the same number of the black node
+    // return end if fit, or return illegal iterator(edge node, contains most one child)
+    iterator rule_5() {
+        iterator it = tree->begin();
+        int blackCount = black_count(it);
+        while (it != tree->end()) {
+            if (black_count(it) != blackCount) {
+                break;
+            }
+            it = next_edge_node(it);
+        }
+        return it;
+    }
+};
 
 END_MINISTL

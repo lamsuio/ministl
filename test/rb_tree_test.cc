@@ -68,3 +68,17 @@ TEST(RBTreeTest, DereaseIteratorTest) {
         EXPECT_TRUE(prev >= *it);
     } while(it != tree.begin());
 }
+
+
+TEST(RBTreeTest, RBTreePropertiesTest) {
+    rb_tree<int> tree;
+    fulfillTree(tree, 1000);
+
+    __rb_test_helper<rb_tree<int>> helper(&tree);
+
+    EXPECT_TRUE(helper.rule_1() == tree.end());
+    EXPECT_TRUE(helper.rule_2() == tree.end());
+    EXPECT_TRUE(helper.rule_3() == tree.end());
+    EXPECT_TRUE(helper.rule_4() == tree.end());
+    EXPECT_TRUE(helper.rule_5() == tree.end());
+}
