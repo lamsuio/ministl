@@ -1,7 +1,7 @@
-#!groovy
+#!/usr/bin/env groovy
 
 podTemplate(label: 'ministl', containers: [
-    containerTemplate(name: 'clang', image: 'goby/clang')
+    containerTemplate(name: 'clang', image: 'goby/clang', ttyEnabled: true)
   ]) {
 
     node('ministl') {
