@@ -120,6 +120,8 @@ struct self {
     }
 };
 
+// For test rb tree properties, friend of rb_tree to access private/protected
+// members. Only test purpose.
 template <class>
 struct __rb_test_helper;
 
