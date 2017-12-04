@@ -6,7 +6,7 @@ podTemplate(label: 'ministl', containers: [
 
     node('ministl') {
         stage('build and test') {
-            git url: 'https://github.com/goby/first-blood.git'
+            git url: 'https://github.com/goby/ministl.git'
             container('clang') {
                 stage('Build') {
                     sh """
