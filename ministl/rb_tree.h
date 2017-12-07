@@ -284,6 +284,10 @@ private:
 
 	void rb_tree_rotate_right(link_type x, link_type& root); // clockwise, right rotation
 
+    void rb_tree_rotate(bool is_left, link_type x, link_type& root) {
+        is_left ? rb_tree_rotate_left(x, root) : rb_tree_rotate_right(x, root);
+    }
+
     // a test inject to access tree's inner structure
     friend __rb_test_helper<rb_tree>;
 
@@ -359,31 +363,90 @@ template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc
 void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::do_remove(const value_type& v) {
     iterator it = do_search(it);
     if (it == end()) {
-        return it;
+        return;
     }
 
     link_type node = it.node;
     if (left(node) != nullptr && right(node) != nullptr) {
-        // change to single child
-        link_type x = node->left_;
-        link_type y = x;
-        while (x) {
-            y = x;
-            x = x->right_;
-        }
-
-        swap(y, node);
+        ++it;
+        link_type prev = it.node;
+        swap_node(prev, node);
     }
 
-    link_type p = node->parent_;
-    link_type bro = node == left(p) ? right(p) : left(p);
     link_type child = left(node) == nullptr ? right(node) : left(node);
 
-    // Not Implemented yet
+    if (child != nullptr) {
+        // the node has one child, the child must be red and node must be black.
+        // so simply swap node and child, and delete node directly.
+        swap_node(child, node);
+    } 
 
     --node_count;
 
-    return it;
+    // fix header's ptr
+    if (leftmost() == node) {
+        leftmost() = parent(node);
+    }
+    if (rightmost() == node) {
+        rightmost() = parent(node);
+    }
+    if (root() == node) {
+        // 1. the node is root
+        root() = nullptr;
+    } else {
+        bool is_left_child = false;
+        link_type p = parent(node);
+        link_type bro = left(p);
+        if (node == left(p)) {
+            left(p) = nullptr;
+            bro = right(p);
+            is_left_child = true;
+        } else {
+            right(p) = nullptr;
+        }
+
+        do {
+            // 2. no bro(single child)
+            if (bro == nullptr) {
+                break;
+            }
+            // 3. has bro, and node is red, nothing changed
+            if (color(node) == kRed) {
+                break;
+            }
+
+            // node is black, make imbalance
+            color(bro) = color(p);  // copy parent color
+            color(p) = kBlack;      // make parent black, keep black number
+            if (left(bro) == nullptr && right(bro) == nullptr) {
+                if (color(bro) == kRed) {
+                    // balance now
+                    break;
+                } else {
+                    // we need reduce black number!!!
+
+                }
+            } else if (right(bro) == nullptr) {
+                // bro has left child, so we rotate to one line
+                if (is_left_child) {
+                    rb_tree_rotate(!is_left_child, bro, root())
+                }
+            } else if (left(bro) == nullptr) {
+                if (!is_left_child) {
+                    rb_tree_rotate(is_left_child, bro, root())
+                }
+            } 
+            if (is_left_child) {
+                color(right(bro)) = kBlack;
+            } else {
+                color(left(bro)) = kBlack;
+            }
+
+            // parent is red, and bro has two child with red(MUST BE)
+            rb_tree_rotate(is_left_child, p, root());
+        } while (false);
+    }
+
 }
 
 template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc>

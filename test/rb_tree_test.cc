@@ -72,13 +72,23 @@ TEST(RBTreeTest, DereaseIteratorTest) {
 
 TEST(RBTreeTest, RBTreePropertiesTest) {
     rb_tree<int> tree;
-    fulfillTree(tree, 1000);
 
     __rb_test_helper<rb_tree<int>> helper(&tree);
 
-    EXPECT_TRUE(helper.rule_1() == tree.end());
-    EXPECT_TRUE(helper.rule_2() == tree.end());
-    EXPECT_TRUE(helper.rule_3() == tree.end());
-    EXPECT_TRUE(helper.rule_4() == tree.end());
-    EXPECT_TRUE(helper.rule_5() == tree.end());
+    for (int i = 0; i < 1000; i++) {
+        fulfillTree(tree, 1000);
+
+        EXPECT_TRUE(helper.rule_1() == tree.end());
+        EXPECT_TRUE(helper.rule_2() == tree.end());
+        EXPECT_TRUE(helper.rule_3() == tree.end());
+        EXPECT_TRUE(helper.rule_4() == tree.end());
+        EXPECT_TRUE(helper.rule_5() == tree.end());
+
+        tree.clear();
+    }
+}
+
+TEST(RBTreeTest, SearchTest) {
+    rb_tree<int> tree;
+    fulfillTree(tree, 1000);
 }
