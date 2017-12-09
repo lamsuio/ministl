@@ -391,40 +391,52 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::do_remove(const value_t
         rightmost() = parent(node);
     }
     if (root() == node) {
-        // 1. the node is root
         root() = nullptr;
     } else {
         bool is_left_child = false;
         link_type p = parent(node);
         link_type bro = left(p);
         if (node == left(p)) {
-            left(p) = nullptr;
             bro = right(p);
             is_left_child = true;
+            left(p) = nullptr;
         } else {
             right(p) = nullptr;
         }
 
         do {
+            link_type curr = node;
+            p   = parent(node);
+            is_left_child = node == left(p);
+            bro = is_left_child ? right(p) : left(p);
+
+            if (root() == curr) {
+                // 1. the node is root
+                break;
+            }
             // 2. no bro(single child)
             if (bro == nullptr) {
                 break;
             }
             // 3. has bro, and node is red, nothing changed
-            if (color(node) == kRed) {
+            if (color(curr) == kRed) {
                 break;
             }
 
             // node is black, make imbalance
             color(bro) = color(p);  // copy parent color
             color(p) = kBlack;      // make parent black, keep black number
-            if (left(bro) == nullptr && right(bro) == nullptr) {
+            if ((left(bro) == nullptr && right(bro) == nullptr) ||
+                (left(bro) != nullptr && right(bro) != nullptr && color(left(bro)) == kBlack && color(right(bro)) == kBlack))
+            {
                 if (color(bro) == kRed) {
                     // balance now
                     break;
                 } else {
                     // we need reduce black number!!!
-
+                    color(bro) = kRed;
+                    curr = p;
+                    continue;
                 }
             } else if (right(bro) == nullptr) {
                 // bro has left child, so we rotate to one line
