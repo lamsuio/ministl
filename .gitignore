@@ -158,3 +158,5 @@ cmake_install.cmake
 install_manifest.txt
 
 *.swp
+
+tags

@@ -115,7 +115,7 @@ struct rb_tree_iterator
 
 template<class R, class Arg>
 struct self {
-    R& operator()(const Arg& v) const {
+    const R& operator()(const Arg& v) const {
         return (R&)v;
     }
 };
@@ -267,10 +267,10 @@ private:
 
     void do_remove(const value_type& v);
 
-    iterator do_search(const value_type& v) const {
+    iterator do_search(const value_type& v) {
         link_type node = root();
         while (node != nullptr) {
-            if (equal_to<Key>(v, key(node))) {
+            if (equal_to<Key>()(KeyOfValue()(v), key(node))) {
                 return iterator(node);
             }
             node = key_compare(v, key(node)) ? left(node) : right(node);
@@ -323,15 +323,15 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::copy_node(link_type d, 
     }
 
     if (leftmost() == s) {
-        leftmost() == d;
+        leftmost() = d;
     }
 
     if (rightmost() == s) {
-        rightmost() == d;
+        rightmost() = d;
     }
 
     if (root() == s) {
-        root() == d;
+        root() = d;
     }
 }
 
@@ -361,7 +361,7 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::clear(){
 
 template<class Key, class Value, class KeyCompare, class KeyOfValue, class Alloc>
 void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::do_remove(const value_type& v) {
-    iterator it = do_search(it);
+    iterator it = do_search(v);
     if (it == end()) {
         return;
     }
@@ -441,11 +441,11 @@ void rb_tree<Key, Value, KeyCompare, KeyOfValue, Alloc>::do_remove(const value_t
             } else if (right(bro) == nullptr) {
                 // bro has left child, so we rotate to one line
                 if (is_left_child) {
-                    rb_tree_rotate(!is_left_child, bro, root())
+                    rb_tree_rotate(!is_left_child, bro, root());
                 }
             } else if (left(bro) == nullptr) {
                 if (!is_left_child) {
-                    rb_tree_rotate(is_left_child, bro, root())
+                    rb_tree_rotate(is_left_child, bro, root());
                 }
             } 
             if (is_left_child) {
